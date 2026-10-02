@@ -6,6 +6,7 @@ import {Select,SelectTrigger,SelectContent,SelectItem,SelectValue} from '@/compo
 import {Checkbox} from '@/components/ui/checkbox';
 import {Toaster,toast} from 'sonner';
 import {catalog,Product} from '@/lib/catalog';
+import ShoppingAssistant from './shopping-assistant';
 const money=(n:number)=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);
 const categories=['All','Electronics','Men','Women','Accessories'];
 export default function Store(){
@@ -23,7 +24,7 @@ useEffect(()=>{const mc=(document as any).modelContext;if(!mc?.registerTool)retu
 function showShop(c='All'){setCategory(c);setView('shop');setQuery('');}
 function startCheckout(){setCartOpen(false);setCheckout(true);setCheckoutKey(crypto.randomUUID());}
 async function placeOrder(e:React.FormEvent){e.preventDefault();try{const result=await action({action:'checkout',address,key:checkoutKey});setCheckout(false);setSuccess(result.orderId);setView('orders');}catch(e:any){toast.error(e.message);}}
-return <><Toaster position="bottom-right" richColors/><div className="announcement">A little upgrade for your everyday. <span>Free delivery on orders over ₹999</span></div>
+return <><ShoppingAssistant signedIn={!!data.user} onProduct={setSelected} onOrders={()=>setView('orders')}/><Toaster position="bottom-left" richColors/><div className="announcement">A little upgrade for your everyday. <span>Free delivery on orders over ₹999</span></div>
 <header className="header"><button className="brand" onClick={()=>showShop()}>nexa<span>mart</span><i/></button><div className="location"><MapPin size={19}/><div><small>Delivering across</small><strong>India</strong></div></div><div className="search"><Search size={20}/><input aria-label="Search products" placeholder="Search for your next everyday favourite" value={query} onChange={e=>{setQuery(e.target.value);setView('shop');}}/>{query&&<button aria-label="Clear search" onClick={()=>setQuery('')}><X size={18}/></button>}</div><button className="header-action account-link" onClick={()=>setAccount(true)}><User size={21}/><span><small>Hello, {data.user?'there':'sign in'}</small><strong>Account</strong></span></button><button className="header-action" onClick={()=>setView('orders')}><Package size={22}/><span>Orders</span></button><button className="cart-button" onClick={()=>setCartOpen(true)}><ShoppingBag size={23}/><span>Cart</span><b>{count}</b></button></header>
 <nav className="nav"><button onClick={()=>{showShop();setFilters(!filters);}}><Menu size={17}/> All departments</button>{categories.slice(1).map(c=><button className={category===c&&view==='shop'?'nav-active':''} key={c} onClick={()=>showShop(c)}>{c==='Men'?"Men’s fashion":c==='Women'?"Women’s fashion":c}</button>)}<div className="nav-spacer"/><button onClick={()=>{setView('saved');setCategory('All');setQuery('');}}><Heart size={16}/> Saved items</button>{data.user?.admin&&<button onClick={()=>setView('admin')}><Settings size={16}/> Manage store</button>}</nav>
 <main>{loadError&&<div className="error-banner" role="alert">{loadError} <button onClick={refresh}>Retry</button></div>}

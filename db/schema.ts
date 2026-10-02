@@ -1,0 +1,9 @@
+import {sql} from 'drizzle-orm';
+import {sqliteTable, text, integer, real, primaryKey, index, check} from 'drizzle-orm/sqlite-core';
+export const products=sqliteTable('products',{id:integer('id').primaryKey(),name:text('name').notNull(),description:text('description').notNull(),category:text('category').notNull(),price:integer('price').notNull(),originalPrice:integer('original_price').notNull(),stock:integer('stock').notNull(),rating:real('rating').notNull(),reviews:integer('reviews').notNull(),image:text('image').notNull(),tag:text('tag').notNull()},t=>[check('stock_nonnegative',sql`${t.stock} >= 0`),check('price_positive',sql`${t.price} > 0`)]);
+export const users=sqliteTable('users',{id:text('id').primaryKey(),email:text('email').notNull(),name:text('name').notNull(),role:text('role').notNull().default('customer')});
+export const settings=sqliteTable('settings',{key:text('key').primaryKey(),value:text('value').notNull()});
+export const cart=sqliteTable('cart',{userId:text('user_id').notNull(),productId:integer('product_id').notNull(),quantity:integer('quantity').notNull()},t=>[primaryKey({columns:[t.userId,t.productId]})]);
+export const wishlist=sqliteTable('wishlist',{userId:text('user_id').notNull(),productId:integer('product_id').notNull()},t=>[primaryKey({columns:[t.userId,t.productId]})]);
+export const orders=sqliteTable('orders',{id:text('id').primaryKey(),userId:text('user_id').notNull(),address:text('address').notNull(),total:integer('total').notNull(),status:text('status').notNull().default('Placed'),createdAt:text('created_at').notNull()},t=>[index('idx_orders_user').on(t.userId)]);
+export const orderItems=sqliteTable('order_items',{orderId:text('order_id').notNull(),productId:integer('product_id').notNull(),name:text('name').notNull(),image:text('image').notNull(),price:integer('price').notNull(),quantity:integer('quantity').notNull()},t=>[primaryKey({columns:[t.orderId,t.productId]})]);
